@@ -1,0 +1,43 @@
+apiVersion: postgres-operator.crunchydata.com/v1beta1
+kind: PostgresCluster
+metadata:
+  name: hippo-standby
+spec:
+  # define this as standby and configure primary host
+  standby:
+    enabled: true
+    host: 20.241.245.109
+  
+  # change service type to loadbalancer  
+  service: 
+    type: LoadBalancer
+
+  image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.6-0
+  postgresVersion: 14
+
+  # primary and replica TLS certs
+  customTLSSecret:
+    name: prim-hippo.tls
+  customReplicationTLSSecret:
+    name: rep-hippo.tls
+
+  instances:
+    - name: instance1
+      dataVolumeClaimSpec:
+        accessModes:
+        - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 1Gi
+  backups:
+    pgbackrest:
+      image: registry.developers.crunchydata.com/crunchydata/crunchy-pgbackrest:ubi8-2.41-0
+      repos:
+      - name: repo1
+        volume:
+          volumeClaimSpec:
+            accessModes:
+            - "ReadWriteOnce"
+            resources:
+              requests:
+                storage: 1Gi

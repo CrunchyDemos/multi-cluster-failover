@@ -1,0 +1,33 @@
+#!/bin/bash -x
+
+### parameters possibly needed
+# cluster name for CN
+
+### possible non usable situatations without adjustments
+# wouldn't work for user provided certs
+# if you needed to sign against existing ca
+
+mkdir -p certs
+
+openssl req -x509 -newkey rsa:4096 -nodes -days 365 -keyout ./certs/ca.key -out ./certs/ca.crt -subj "/C=US/ST=VA/L=Beach/O=crunchydata/OU=SA/CN=hippo-ca/emailAddress=support@crunchydata.com"
+
+openssl req -newkey rsa:4096 -nodes -keyout ./certs/primCluster.key -out ./certs/primCluster.csr -subj "/C=US/ST=VA/L=Beach/O=crunchydata/OU=SA/CN=hippo-primary/emailAddress=support@crunchydata.com"
+
+openssl req -newkey rsa:4096 -nodes -keyout ./certs/repCluster.key -out ./certs/repCluster.csr -subj "/C=US/ST=VA/L=Beach/O=crunchydata/OU=SA/CN=_crunchyrepl/emailAddress=support@crunchydata.com"
+
+openssl x509 -req -in ./certs/primCluster.csr -CA ./certs/ca.crt -CAkey ./certs/ca.key -CAcreateserial -out ./certs/primCluster.crt 
+
+openssl x509 -req -in ./certs/repCluster.csr -CA ./certs/ca.crt -CAkey ./certs/ca.key -CAcreateserial -out ./certs/repCluster.crt
+
+
+kubectl create secret generic -n postgres-operator prim-hippo.tls \
+  --from-file=ca.crt=./certs/ca.crt \
+  --from-file=tls.key=./certs/primCluster.key \
+  --from-file=tls.crt=./certs/primCluster.crt --dry-run=client -o yaml > prim-hippo.yml
+
+
+kubectl create secret generic -n postgres-operator rep-hippo.tls \
+  --from-file=ca.crt=./certs/ca.crt \
+  --from-file=tls.key=./certs/repCluster.key \
+  --from-file=tls.crt=./certs/repCluster.crt --dry-run=client -o yaml > rep-hippo.yml
+
