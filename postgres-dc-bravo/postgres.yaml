@@ -5,7 +5,7 @@ metadata:
 spec:
   standby:
     enabled: false
-    host: LoadBalancer-dc-charlie
+    #host: LoadBalancer-dc-charlie
   service: 
     type: LoadBalancer
   image: registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-14.6-0
