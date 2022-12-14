@@ -3,10 +3,10 @@ kind: PostgresCluster
 metadata:
   name: hippo-standby
 spec:
-  # define this as standby and configure primary host
   standby:
     enabled: true
-    host: 20.241.245.109
+  # host: LoadBalancer-dc-bravo
+    host: 34.150.171.139
   
   # change service type to loadbalancer  
   service: 
