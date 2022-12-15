@@ -1,12 +1,11 @@
 apiVersion: postgres-operator.crunchydata.com/v1beta1
 kind: PostgresCluster
 metadata:
-  name: hippo-standby
+  name: hippo-charlie
 spec:
-  # define this as standby and configure primary host
   standby:
     enabled: true
-    host: 20.241.245.109
+  # host: LoadBalancer-dc-bravo
   
   # change service type to loadbalancer  
   service: 
